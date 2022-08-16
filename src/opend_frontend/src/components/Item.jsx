@@ -11,7 +11,8 @@ function Item(props) {
   const [image, setImage] = useState();
 
   // Canister Id
-  const id = Principal.fromText(props.id);
+  // const id = Principal.fromText(props.id);
+  const id = props.id;
 
   const localHost = "http://localhost:8080/";
 
