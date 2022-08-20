@@ -14,7 +14,6 @@ function Header() {
   async function getNFTs() {
     const ownerId = await opend_backend.getPrincipalId();
     const userNFTs = await opend_backend.getOwnedNFTs(ownerId);
-    console.log(userNFTs);
 
     setOwnedGallery(<Gallery title="My NFTs" ids={userNFTs} />);
   }
