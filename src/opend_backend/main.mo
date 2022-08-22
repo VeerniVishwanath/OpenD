@@ -1,10 +1,12 @@
 import Cycles "mo:base/ExperimentalCycles";
 import Debug "mo:base/Debug";
 import HashMap "mo:base/HashMap";
+import Iter "mo:base/Iter";
 import List "mo:base/List";
 import NFTActorClass "../NFT/nft";
 import Pricipal "mo:base/Array";
 import Principal "mo:base/Principal";
+import Array "mo:base/Array";
 
 actor OpenD{
 
@@ -64,6 +66,12 @@ actor OpenD{
     };
 
     return List.toArray(userNFTs);
+  };
+
+  //Return an Array of listed NFT Ids
+  public query func getListedNFTs(): async [Principal]{
+    let ids = Iter.toArray(mapOfListings.keys());
+    return ids;
   };
 
   //Returns the Pricipal ID of the caller

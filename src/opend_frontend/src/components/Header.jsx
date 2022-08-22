@@ -10,12 +10,17 @@ import Principal from "@dfinity/principal";
 
 function Header() {
   const [userOwnedGallery, setOwnedGallery] = useState();
+  const [listingGallery, setListingGallery] = useState();
 
   async function getNFTs() {
     const ownerId = await opend_backend.getPrincipalId();
     const userNFTs = await opend_backend.getOwnedNFTs(ownerId);
 
     setOwnedGallery(<Gallery title="My NFTs" ids={userNFTs} />);
+
+    const listedNFTIds = await opend_backend.getListedNFTs();
+    console.log(listedNFTIds);
+    setListingGallery(<Gallery title="Listings" ids={ listedNFTIds } /> );
   }
 
   useEffect(() => {
@@ -61,7 +66,7 @@ function Header() {
           path="/"
           element={<img className="bottom-space" src={homeImage} />}
         ></Route>
-        <Route exact path="/discover" element={<h1>Discover</h1>}></Route>
+        <Route exact path="/discover" element={listingGallery}></Route>
         <Route exact path="/minter" element={<Minter />}></Route>
         <Route exact path="/collection" element={userOwnedGallery}></Route>
       </Routes>
