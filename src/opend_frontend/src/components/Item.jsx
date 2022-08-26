@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import logo from "../../assets/logo.png";
 import { Actor, HttpAgent } from "@dfinity/agent";
 import { idlFactory } from "../../../declarations/nft";
+import { idlFactory as tokenIdlFactory } from "../../../declarations/token_backend";
 import { Principal } from "@dfinity/principal";
 import Button from "./Button";
-import { opend_backend } from "../../../declarations/opend_backend/index";
+import { opend_backend } from "../../../declarations/opend_backend";
 import PriceLable from "./PriceLable";
 
 function Item(props) {
@@ -18,6 +19,8 @@ function Item(props) {
   const [blur, setBlur] = useState();
   const [sellStatus, setSellStatus] = useState("");
   const [priceLable, setPriceLable] = useState();
+  const [shouldDisplay, setShouldDisplay] = useState(true);
+
   // Canister Id
   // const id = Principal.fromText(props.id);
   const id = props.id;
@@ -26,7 +29,7 @@ function Item(props) {
 
   // Making a http request to access the canister
   const agent = new HttpAgent({ host: localHost });
-  //Remove line when Deploying on live ICP Blockchain
+  /////////////////////////Remove line when Deploying on live ICP Blockchain
   agent.fetchRootKey();
 
   let NFTActor;
@@ -67,8 +70,8 @@ function Item(props) {
     } else if (props.role == "discover") {
       const ownerId = await opend_backend.getPrincipalId();
       const originalOwner = await opend_backend.getOriginalOwner(id);
-      if ( originalOwner.toText() != ownerId.toText()){
-      setButton(<Button handleClick={handleBuy} text="Buy" />);
+      if (originalOwner.toText() != ownerId.toText()) {
+        setButton(<Button handleClick={handleBuy} text="Buy" />);
       }
       const nftPrice = await opend_backend.getNFTPrice(id);
       setPriceLable(<PriceLable sellPrice={nftPrice.toString()} />);
@@ -119,12 +122,39 @@ function Item(props) {
   }
 
   //Function to Buy
-  async function handleBuy(){
-    console.log("Buy");
+  async function handleBuy() {
+    setLoaderHidden(false);
+    setButton();
+    console.log("Buy button triggered");
+    const tokenActor = await Actor.createActor(tokenIdlFactory, {
+      agent,
+      canisterId: Principal.fromText("renrk-eyaaa-aaaaa-aaada-cai"),
+    });
+
+    const sellerId = await opend_backend.getOriginalOwner(id);
+    const itemPrice = await opend_backend.getNFTPrice(id);
+
+    const result = await tokenActor.transfer(sellerId, itemPrice);
+
+    if (result == "success") {
+      const BuyerId = await opend_backend.getPrincipalId();
+      console.log(BuyerId);
+      const transferResult = await opend_backend.completePurchase(
+        id,
+        sellerId,
+        BuyerId
+      );
+      console.log("Transfer Results " + transferResult);
+    }
+    setLoaderHidden(true);
+    setShouldDisplay(false);
   }
 
   return (
-    <div className="disGrid-item">
+    <div
+      style={{ display: shouldDisplay ? "inline" : "none" }}
+      className="disGrid-item"
+    >
       <div className="disPaper-root disCard-root makeStyles-root-17 disPaper-elevation1 disPaper-rounded">
         <img
           className="disCardMedia-root makeStyles-image-19 disCardMedia-media disCardMedia-img"
@@ -138,7 +168,7 @@ function Item(props) {
           <div></div>
         </div>
         <div className="disCardContent-root">
-        {priceLable}
+          {priceLable}
           <h2 className="disTypography-root makeStyles-bodyText-24 disTypography-h5 disTypography-gutterBottom">
             {name} <span className="purple-text"> {sellStatus}</span>
           </h2>
