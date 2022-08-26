@@ -5,6 +5,7 @@ import { idlFactory } from "../../../declarations/nft";
 import { Principal } from "@dfinity/principal";
 import Button from "./Button";
 import { opend_backend } from "../../../declarations/opend_backend/index";
+import PriceLable from "./PriceLable";
 
 function Item(props) {
   // React UseState Hooks
@@ -16,7 +17,7 @@ function Item(props) {
   const [loaderHidden, setLoaderHidden] = useState(true);
   const [blur, setBlur] = useState();
   const [sellStatus, setSellStatus] = useState("");
-
+  const [priceLable, setPriceLable] = useState();
   // Canister Id
   // const id = Principal.fromText(props.id);
   const id = props.id;
@@ -53,14 +54,24 @@ function Item(props) {
     );
     setImage(image);
 
-    if (await opend_backend.isListed(id)) {
-      setBlur({ filter: "blur(4px)" });
-      setOwner("OpenD");
-      setPriceInput();
-      setButton();
-      setSellStatus(" Listed");
-    } else {
-      setButton(<Button handleClick={handleSell} text="Sell" />);
+    if (props.role == "collections") {
+      if (await opend_backend.isListed(id)) {
+        setBlur({ filter: "blur(4px)" });
+        setOwner("OpenD");
+        setPriceInput();
+        setButton();
+        setSellStatus(" Listed");
+      } else {
+        setButton(<Button handleClick={handleSell} text="Sell" />);
+      }
+    } else if (props.role == "discover") {
+      const ownerId = await opend_backend.getPrincipalId();
+      const originalOwner = await opend_backend.getOriginalOwner(id);
+      if ( originalOwner.toText() != ownerId.toText()){
+      setButton(<Button handleClick={handleBuy} text="Buy" />);
+      }
+      const nftPrice = await opend_backend.getNFTPrice(id);
+      setPriceLable(<PriceLable sellPrice={nftPrice.toString()} />);
     }
   }
 
@@ -71,6 +82,7 @@ function Item(props) {
 
   //Price variable
   let price;
+
   //Function to handle button click
   function handleSell() {
     console.log("Clicks working");
@@ -106,6 +118,11 @@ function Item(props) {
     }
   }
 
+  //Function to Buy
+  async function handleBuy(){
+    console.log("Buy");
+  }
+
   return (
     <div className="disGrid-item">
       <div className="disPaper-root disCard-root makeStyles-root-17 disPaper-elevation1 disPaper-rounded">
@@ -121,6 +138,7 @@ function Item(props) {
           <div></div>
         </div>
         <div className="disCardContent-root">
+        {priceLable}
           <h2 className="disTypography-root makeStyles-bodyText-24 disTypography-h5 disTypography-gutterBottom">
             {name} <span className="purple-text"> {sellStatus}</span>
           </h2>

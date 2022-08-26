@@ -115,4 +115,18 @@ actor OpenD{
     };
   };
 
+  public query func getOriginalOwner(id:Principal) :async Principal{
+    var ownerId: Principal = switch(mapOfListings.get(id)){
+      case null return Principal.fromText("");
+      case (?result) result.itemOwner;
+    };
+    return ownerId;
+  };
+
+  public query func getNFTPrice(id: Principal): async Nat{
+    switch(mapOfListings.get(id)){
+      case null return 0;
+      case (?result) return result.itemPrice;
+    }
+  }
 }

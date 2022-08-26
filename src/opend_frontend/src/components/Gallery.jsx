@@ -10,7 +10,7 @@ function Gallery(props) {
     if(props.ids != undefined){
       setItems(
         props.ids.map(id => (
-          <Item key={id} id={id} />
+          <Item key={id} id={id} role={props.role}/>
         ))
       );
     }

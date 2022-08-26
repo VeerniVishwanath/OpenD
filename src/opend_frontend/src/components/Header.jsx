@@ -16,11 +16,11 @@ function Header() {
     const ownerId = await opend_backend.getPrincipalId();
     const userNFTs = await opend_backend.getOwnedNFTs(ownerId);
 
-    setOwnedGallery(<Gallery title="My NFTs" ids={userNFTs} />);
+    setOwnedGallery(<Gallery title="My NFTs" ids={userNFTs} role="collections" />);
 
     const listedNFTIds = await opend_backend.getListedNFTs();
     console.log(listedNFTIds);
-    setListingGallery(<Gallery title="Listings" ids={ listedNFTIds } /> );
+    setListingGallery(<Gallery title="Listings" ids={listedNFTIds} role="discover" />);
   }
 
   useEffect(() => {
@@ -65,10 +65,10 @@ function Header() {
           exact
           path="/"
           element={<img className="bottom-space" src={homeImage} />}
-        ></Route>
-        <Route exact path="/discover" element={listingGallery}></Route>
-        <Route exact path="/minter" element={<Minter />}></Route>
-        <Route exact path="/collection" element={userOwnedGallery}></Route>
+        />
+        <Route exact path="/discover" element={listingGallery} />
+        <Route exact path="/minter" element={<Minter />} />
+        <Route exact path="/collection" element={userOwnedGallery} />
       </Routes>
     </BrowserRouter>
   );

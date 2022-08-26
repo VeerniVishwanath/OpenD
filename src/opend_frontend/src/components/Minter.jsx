@@ -11,7 +11,6 @@ function Minter() {
 
 
   async function onSubmit(Data) {
-    console.log();
     setLoaderHidden(false);
     const name = Data.name;
     const image = Data.image[0];
@@ -79,7 +78,7 @@ function Minter() {
           Minted!
         </h3>
         <div className="horizontal-center">
-          <Item id={nftPrincipal} />
+          <Item id={nftPrincipal} role="collections"/>
         </div>
       </div>
     );
